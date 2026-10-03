@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Ascent Lab: AeroMegas Trajectory Report and Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f1efe9;--pn:#fffdf8;--ink:#161a22;--mut:#6a7080;--ln:#e3dfd3;--p:#d9530b;--r:#078f80;--gl:#0000000a}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#060a13;--pn:#0d1423;--ink:#e8edf7;--mut:#8b97ad;--ln:#1c2740;--p:#ff8a3d;--r:#2fe6c8;--gl:#ffffff10}}
+:root[data-theme=dark]{--bg:#060a13;--pn:#0d1423;--ink:#e8edf7;--mut:#8b97ad;--ln:#1c2740;--p:#ff8a3d;--r:#2fe6c8;--gl:#ffffff10}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Space Grotesk',system-ui,sans-serif}
+.m,.kv,.sl output,th,td,.eq,code{font-family:'JetBrains Mono',ui-monospace,monospace}
+.w{max-width:1280px;margin:0 auto;padding:18px 20px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.br{display:flex;align-items:center;gap:12px}h1{font-size:22px;margin:0;letter-spacing:-.01em}.sub{color:var(--mut);font-size:12.5px;margin:0}
+.seg{display:flex;gap:2px;padding:3px;border:1px solid var(--ln);border-radius:999px;background:var(--pn);flex-wrap:wrap}
+button{font:inherit;font-size:13px;padding:6px 13px;border-radius:999px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+button:hover{background:var(--gl)}button.on{background:var(--ink);color:var(--bg);font-weight:600}button:disabled{opacity:.5;cursor:wait}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--r);outline-offset:2px}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:16px}.card h2{font-size:15px;margin:0 0 10px}.card h3{font-size:13px;margin:14px 0 6px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.hd h2{margin:0}
+#stage{padding:0;overflow:hidden;margin-bottom:14px;background:#050914;border-color:#1c2740}
+#view{height:clamp(420px,64vh,620px)}#cv{width:100%;height:100%;display:block}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;background:#0b1222;color:#e8edf7}
+.bar button{color:#e8edf7}.bar button:hover{background:#ffffff14}.bar button.on{background:#e8edf7;color:#0b1222}.bar .seg{background:#0f182b;border-color:#1f2c47}
+.bar .go{background:#2fe6c8;color:#04201b;font-weight:700;min-width:82px}
+.sc{flex:1;min-width:160px}.sc input{width:100%;accent-color:#2fe6c8;margin:0}#clk{font:600 13px 'JetBrains Mono',monospace;min-width:92px}
+#kpi{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:1100px){#kpi{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){#kpi{grid-template-columns:repeat(2,1fr)}}
+.k{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:12px 14px}.kh{display:flex;justify-content:space-between;font-weight:600;font-size:13px}.kh span{color:var(--mut);font-weight:400}
+.kv{font-weight:600;font-size:17px;margin:5px 0 2px;display:flex;gap:10px;flex-wrap:wrap}.vp{color:var(--p)}.vr{color:var(--r)}.ks{color:var(--mut);font-size:11.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}@media(max-width:1000px){.two{grid-template-columns:1fr}}
+.badge{font:600 12px 'JetBrains Mono',monospace;background:var(--gl);color:var(--r);padding:5px 10px;border-radius:999px}
+.note{color:var(--mut);font-size:12px;margin:8px 0 0}
+.cw{position:relative;border:1px solid var(--ln);border-radius:12px;padding:10px 12px}
+canvas.c{width:100%;display:block}.cur{position:absolute;width:1px;background:#f59e0b;pointer-events:none}
+.lg{display:flex;gap:12px;flex-wrap:wrap;color:var(--mut);font-size:12px}.lg i{display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--ln)}th:first-child,td:first-child,td.l,th.l{text-align:left;font-family:'Space Grotesk',sans-serif}th{color:var(--mut);font-weight:600}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin:8px 0}.sl input{grid-column:1/3;accent-color:var(--r)}.sl label{color:var(--mut);font-size:13px}.sl output{font-weight:600;font-size:12.5px}
+.bt{background:var(--r);color:#04201b;font-weight:700}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ok{color:var(--r);font-weight:700}.bad{color:#e5484d;font-weight:700}#chk{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12px;margin-top:8px;font-family:'JetBrains Mono',monospace}
+.rep{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}@media(max-width:1000px){.rep{grid-template-columns:1fr}}.full{grid-column:1/-1}
+.rep p,.rep li{max-width:75ch}.rep ul{padding-left:18px;margin:6px 0}.rep li{margin-bottom:6px}
+.eq{background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:nowrap;margin:8px 0}
+code{font-size:12px;background:var(--gl);padding:1px 5px;border-radius:4px}.sx{overflow-x:auto}
+nav.chips{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 12px}nav.chips a{color:var(--ink);text-decoration:none;border:1px solid var(--ln);background:var(--pn);padding:5px 12px;border-radius:999px;font-size:12.5px}nav.chips a:hover{background:var(--gl)}
+.au{color:var(--mut);font-size:12.5px;margin-top:20px}
+@media print{#stage,.top .seg,nav.chips{display:none}}
+</style></head><body><div class="w">
+<div class="top"><div class="br"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#0b1222"/><path d="M20 6c4 4 5 10 4 18h-8c-1-8 0-14 4-18z" fill="#e8edf7"/><path d="M16 24l-4 6 5-2zM24 24l4 6-5-2z" fill="#2fe6c8"/><path d="M18 27h4l-2 7z" fill="#ff8a3d"/></svg>
+<div><h1>Ascent Lab</h1><p class="sub">Challenge 01: Ascent Trajectory Optimisation. Team AeroMegas, October 2026. Baseline vs optimised single-stage vehicle, 2-D point mass.</p></div></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" id="seg"><button data-m="dual" class="on">Both</button><button data-m="o">Optimised</button><button data-m="b">Baseline</button></div><div class="seg"><button id="th">Theme</button></div></div></div>
+<div class="card" id="stage"><div id="view"><canvas id="cv" role="img" aria-label="Animated trajectories of baseline and optimised rocket"></canvas></div>
+<div class="bar"><button class="go" id="play">Pause</button><button id="rs">Reset</button><span id="clk">T+0.0 s</span>
+<div class="sc"><input type="range" id="scrub" min="0" max="440" step="0.1" value="0" aria-label="Time"></div>
+<button id="jb">MECO</button><button id="ja">Apogee</button><button id="jl">Impact</button>
+<div class="seg" id="sp"><button data-s="5">5x</button><button data-s="20" class="on">20x</button><button data-s="60">60x</button></div></div></div>
+<div id="kpi"></div>
+<div class="two"><div class="card"><div class="hd"><h2>Flight telemetry</h2><div class="seg" id="tabs"></div></div>
+<div class="lg"><span><i style="background:var(--p)"></i>Baseline</span><span><i style="background:var(--r)"></i>Optimised</span></div>
+<div class="cw" style="margin-top:10px"><canvas class="c" id="tel" style="height:300px"></canvas><div class="cur" id="tc"></div></div></div>
+<div class="card"><div class="hd"><h2>Performance comparison</h2><span class="badge" id="gain"></span></div><table id="res"></table>
+<p class="note">Live values from the in-browser RK4 integrator (dt 0.1 s, ISA 1976). The report's RK45 values are 9.283 km and 175.106 km.</p></div></div>
+<div class="two"><div class="card"><div class="hd"><h2>Design playground</h2></div>
+<p class="note" style="margin:0">Edit the six design variables of the optimised vehicle. The baseline stays fixed. Run Differential Evolution to search the design space again (population 54, 18 generations, seed 42).</p>
+<div id="sl"></div><div id="chk"></div>
+<div class="row"><button class="bt" id="de">Run Differential Evolution</button><button id="rst" style="border:1px solid var(--ln)">Reset to report design</button></div><p class="note" id="msg"></p></div>
+<div class="card"><div class="hd"><h2>Optimiser and sensitivity</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="bt" id="mcb" hidden>Run Monte Carlo</button><div class="seg" id="rt"><button data-r="cv" class="on">Convergence</button><button data-r="ds">Design space</button><button data-r="mc">Monte Carlo</button></div></div></div>
+<canvas class="c" id="rc" style="height:300px"></canvas><p class="note" id="rn"></p></div></div>
+<nav class="chips" aria-label="Report sections"><a href="#abstract">Abstract</a><a href="#problem">Problem</a><a href="#model">Model</a><a href="#numerics">Numerics</a><a href="#baseline">Baseline</a><a href="#optim">Optimisation</a><a href="#results">Results</a><a href="#discussion">Discussion</a><a href="#verification">Verification</a><a href="#limits">Limitations</a><a href="#conclusion">Conclusion</a><a href="#run">How to run</a></nav>
+<div class="rep">
+<div class="card full" id="abstract"><h2>Abstract</h2><p>This report presents a computational model that predicts the ascent trajectory of a single-stage launch vehicle and a global optimiser that searches the design space for the configuration reaching the highest altitude under fixed resource limits. The simulation is a 2-D point-mass model including vehicle mass variation, propellant consumption, thrust, drag, altitude-dependent gravity, atmospheric density (US Standard Atmosphere 1976), velocity, acceleration, altitude and time of flight. Six design variables (thrust, propellant mass, burn time, launch angle, drag coefficient and dry mass) are optimised with Differential Evolution followed by SLSQP refinement.</p>
+<p>Relative to the baseline, the optimised vehicle raises maximum altitude from <b class="vp">9.28 km</b> to <b class="vr">175.11 km</b> and maximum velocity from 330 m/s to 1,639 m/s, while satisfying all propellant, mass, thrust, burn-time and launch-angle constraints. A Monte Carlo test (5 % parameter scatter) quantifies robustness.</p>
+<p class="au">Authors: Gur Asees, Anjandeep, Kairav</p></div>
+
+<div class="card" id="problem"><h2>1. Problem statement</h2><p>A launch vehicle carries a limited propellant mass and has a defined configuration. The task is to find design or operating parameters that maximise a performance objective (maximum altitude, maximum downrange distance, or minimum propellant requirement) subject to engineering constraints.</p>
+<p>The simulation must model vehicle mass variation, propellant consumption, thrust, drag, gravity, atmospheric density, velocity, acceleration, altitude and time of flight. It must produce altitude, velocity, acceleration and mass versus time, maximum altitude, maximum velocity, time to apogee, and a baseline-versus-optimised comparison. The Advanced Level requires an algorithm that searches the design space automatically.</p>
+<h3>Requirement compliance</h3><div class="sx"><table><tr><th>Requirement</th><th>Implemented in</th></tr>
+<tr><td>Mass variation, propellant use</td><td><code>physics.py</code>, <code>simulation.py</code></td></tr><tr><td>Thrust, drag, gravity, density</td><td><code>physics.py</code>, <code>atmosphere.py</code></td></tr>
+<tr><td>Velocity, acceleration, altitude, time</td><td><code>simulation.py</code>, <code>analysis.py</code></td></tr><tr><td>Plots vs time</td><td>Figures 1-4, <code>visualization.py</code></td></tr>
+<tr><td>Max altitude, max velocity, apogee time</td><td><code>analysis.py</code></td></tr><tr><td>Baseline vs optimised</td><td><code>compare_configurations()</code>, Figures 7-9</td></tr>
+<tr><td>Automatic optimisation</td><td><code>optimizer.py</code> (DE + SLSQP)</td></tr></table></div></div>
+
+<div class="card" id="model"><h2>2. Mathematical model</h2><p>The vehicle is a point mass in the vertical (downrange-altitude) plane. State: downrange x, altitude h, velocities vx, vy, and mass m.</p>
+<h3>Thrust and mass flow</h3><div class="eq">Tx = T cos(θ) &nbsp; Ty = T sin(θ) &nbsp; (θ constant)<br>mdot = T / (Isp · g0) &nbsp; m(t) = m_dry + m_prop(t)<br>T = 0 when t ≥ t_burn or m_prop ≤ 0</div>
+<p>Burnout occurs at the earlier of the commanded burn time and propellant exhaustion. Unburned propellant stays on board as dead mass.</p>
+<h3>Drag, dynamic pressure, gravity</h3><div class="eq">D = ½ ρ v² Cd A &nbsp; Dx = −D·vx/v &nbsp; Dy = −D·vy/v<br>q = ½ ρ v² &nbsp; (Max-Q is the peak of q)<br>g(h) = g0 (R / (R + h))² &nbsp; g0 = 9.80665, R = 6371 km</div>
+<h3>Equations of motion</h3><div class="eq">dx/dt = vx &nbsp; dh/dt = vy<br>dvx/dt = (Tx + Dx) / m<br>dvy/dt = (Ty + Dy) / m − g(h)<br>dm/dt = −mdot</div>
+<h3>Atmosphere</h3><p>Density follows the US Standard Atmosphere 1976: piecewise layers with a hydrostatic relation and a lapse rate in each layer (ρ = p / (R_air·T)), valid to 86 km, with exponential decay above. A simple exponential model ρ = ρ0·exp(−h/H) is also available through the configuration.</p></div>
+
+<div class="card" id="numerics"><h2>3. Numerical method and software design</h2><p>The equations are integrated with adaptive Runge-Kutta 4(5) (<code>scipy.integrate.solve_ivp</code>, rtol 1e-6, atol 1e-8, output every 0.05 s). Terminal events stop the run at ground impact (after liftoff) or at a safety altitude ceiling. A forward-Euler integrator is available for comparison. The optimiser uses looser tolerances (rtol 1e-4); the final designs are re-simulated with production settings so the comparison is fair.</p>
+<div class="sx"><table><tr><th>Module</th><th>Role</th></tr><tr><td><code>config.py</code></td><td>RocketConfig dataclass: vehicle, environment, limits, bounds, numerics</td></tr>
+<tr><td><code>atmosphere.py</code></td><td>Density models (ISA 1976 / exponential)</td></tr><tr><td><code>physics.py</code></td><td>Thrust, drag, gravity, mass flow, ODE right-hand side</td></tr>
+<tr><td><code>simulation.py</code></td><td>RK45 / Euler integration, events, Trajectory object</td></tr><tr><td><code>analysis.py</code></td><td>Metrics, validation checks, constraint report, comparison table</td></tr>
+<tr><td><code>optimizer.py</code></td><td>DE, SLSQP, penalties, design-space map, Monte Carlo</td></tr><tr><td><code>visualization.py</code></td><td>Figures 1-10 and supporting plots</td></tr><tr><td><code>main.py</code></td><td>Pipeline and command-line interface</td></tr></table></div>
+<p class="note">This page re-implements the same model in JavaScript (fixed-step RK4) so the simulator above runs in the browser.</p></div>
+
+<div class="card" id="baseline"><h2>4. Baseline vehicle</h2><div class="sx"><table><tr><th>Parameter</th><th>Value</th><th class="l">Parameter</th><th>Value</th></tr>
+<tr><td>Dry mass</td><td>160 kg</td><td class="l">Specific impulse</td><td>245 s</td></tr><tr><td>Propellant mass</td><td>180 kg</td><td class="l">Drag coefficient</td><td>0.42</td></tr>
+<tr><td>Thrust (constant)</td><td>6,200 N</td><td class="l">Reference area</td><td>0.18 m²</td></tr><tr><td>Commanded burn time</td><td>42 s</td><td class="l">Launch angle</td><td>72°</td></tr>
+<tr><td>Initial mass</td><td>340 kg</td><td class="l">Initial T/W</td><td>≈ 1.86</td></tr></table></div></div>
+
+<div class="card" id="optim"><h2>5. Optimisation problem</h2><div class="eq">maximise h_max(x), x = [T, m_prop, t_burn, θ, Cd, m_dry]<br>subject to m_prop ≤ 260 kg &nbsp; m_dry + m_prop ≤ 450 kg<br>3,500 ≤ T ≤ 14,000 N &nbsp; 15 ≤ t_burn ≤ 90 s<br>55° ≤ θ ≤ 90° &nbsp; 0.22 ≤ Cd ≤ 0.55 &nbsp; 130 ≤ m_dry ≤ 220 kg</div>
+<p>The code minimises J = −h_max. Constraint violations receive a large linear penalty. Maximum downrange and minimum propellant to reach a target altitude are available as other objectives on the command line.</p>
+<p><b>Stage 1, Differential Evolution:</b> best1bin, population factor 9, 18 generations, mutation 0.5-1.0, recombination 0.7, seed 42. It is a global search that is not easily trapped in local optima.</p>
+<p><b>Stage 2, SLSQP:</b> local gradient-based refinement with an explicit initial-mass constraint. Total cost: 1,163 simulation evaluations.</p></div>
+
+<div class="card full" id="results"><h2>6. Results as reported</h2>
+<div class="two" style="margin:0"><div class="sx"><table><tr><th>Quantity</th><th style="color:var(--p)">Baseline</th><th style="color:var(--r)">Optimised</th><th>Change</th></tr>
+<tr><td>Maximum altitude</td><td>9.283 km</td><td>175.106 km</td><td>+1,786 %</td></tr><tr><td>Maximum velocity</td><td>330.2 m/s</td><td>1,639.2 m/s</td><td>+396 %</td></tr>
+<tr><td>Maximum acceleration</td><td>20.28 m/s²</td><td>81.32 m/s²</td><td>+301 %</td></tr><tr><td>Time to apogee</td><td>64.9 s</td><td>230.3 s</td><td>+255 %</td></tr>
+<tr><td>Total flight time</td><td>117.5 s</td><td>433.0 s</td><td>+268 %</td></tr><tr><td>Downrange distance</td><td>11.32 km</td><td>14.11 km</td><td>+24.7 %</td></tr>
+<tr><td>Initial mass</td><td>340.0 kg</td><td>387.7 kg</td><td>+14.0 %</td></tr><tr><td>Propellant consumed</td><td>108.4 kg</td><td>257.6 kg</td><td>+137.7 %</td></tr>
+<tr><td>Engine cutoff (actual)</td><td>41.95 s</td><td>57.65 s</td><td>+37.4 %</td></tr><tr><td>Max dynamic pressure</td><td>35.3 kPa</td><td>295.4 kPa</td><td>+737 %</td></tr></table></div>
+<div class="sx"><table><tr><th>Variable</th><th>Baseline</th><th>Optimised</th><th class="l">Bound status</th></tr>
+<tr><td>Thrust</td><td>6,200 N</td><td>10,729 N</td><td class="l">Interior</td></tr><tr><td>Propellant mass</td><td>180 kg</td><td>257.65 kg</td><td class="l">Near cap (260)</td></tr>
+<tr><td>Burn time</td><td>42 s</td><td>62.02 s</td><td class="l">Slack, tanks empty at 57.65 s</td></tr><tr><td>Launch angle</td><td>72°</td><td>88.98°</td><td class="l">Near vertical</td></tr>
+<tr><td>Drag coefficient</td><td>0.42</td><td>0.2228</td><td class="l">At lower bound</td></tr><tr><td>Dry mass</td><td>160 kg</td><td>130.07 kg</td><td class="l">At lower bound</td></tr>
+<tr><td>Initial mass</td><td>340 kg</td><td>387.7 kg</td><td class="l">Below 450 kg</td></tr></table></div></div>
+<p>All five constraint checks (propellant, mass, thrust, burn time, launch angle) report PASS, and the trajectory validation (mass non-increasing, propellant non-negative, drag opposing velocity, no thrust after burnout) raised no warnings. The plots for Figures 1-12 are drawn live in the simulator above.</p></div>
+
+<div class="card" id="discussion"><h2>7. Discussion</h2><ul>
+<li><b>Why the altitude gain is so large.</b> Apogee grows roughly with the square of burnout velocity. The mass ratio rises from 340/232 ≈ 1.47 (108 kg burned) to 387.7/130.1 ≈ 2.98 (all propellant burned), raising ideal Δv from about 920 to 2,630 m/s (Isp 245 s).</li>
+<li><b>Use all the propellant.</b> Propellant goes to the cap and dry mass to its lower bound. Unburned propellant is dead mass; the baseline leaves 71.6 kg unused.</li>
+<li><b>Near-vertical launch.</b> With a constant thrust direction, any horizontal component wastes energy against gravity. The optimum is 88.98°, which still leaves about 14 km of downrange drift.</li>
+<li><b>Low drag and low structure mass.</b> Cd and dry mass enter the losses almost linearly, so both hit their lower bounds. In a real design those bounds would set the answer.</li>
+<li><b>Thrust is a genuine trade-off.</b> Higher thrust cuts gravity loss but raises drag loss and Max-Q. The optimum (10.7 kN) is interior to 3.5-14 kN. Initial T/W rises from 1.86 to about 2.82.</li>
+<li><b>Burn time is slack.</b> The commanded 62.02 s is not binding because the engine stops at 57.65 s when propellant ends (mass flow 4.47 kg/s).</li></ul></div>
+
+<div class="card" id="verification"><h2>8. Verification and sensitivity</h2><p>The code self-checks mass conservation, non-negative propellant, drag direction and thrust cut-off. Apogee is the interpolated zero crossing of vertical velocity and agrees with the maximum-altitude sample. The optimised design uses the same physics and integrator as the baseline.</p>
+<p><b>Monte Carlo robustness.</b> Forty samples with all six variables scattered at 5 % standard deviation gave a mean apogee of 173.7 km, a standard deviation of 19.6 km (about 11 %), and a range of 138.4-209.3 km. A 5 % input uncertainty therefore produces about 11 % output scatter, so apogee is highly sensitive to thrust, mass and angle tolerances. Scattered samples may fall slightly outside the bounds because no re-clipping is applied. Try it in the Monte Carlo tab above.</p></div>
+
+<div class="card" id="limits"><h2>9. Limitations</h2><ul>
+<li>Single stage, constant thrust magnitude and direction (no gravity turn or pitch programme).</li>
+<li>Point mass: no rotation, aerodynamic moments, wind or Earth rotation; flat downrange.</li>
+<li>Constant Isp (no nozzle altitude compensation) and constant Cd (no Mach dependence; transonic drag rise ignored).</li>
+<li>No structural, thermal or g-load limits beyond the set bounds. The optimum shows Max-Q ≈ 295 kPa and ≈ 8.3 g peak acceleration.</li>
+<li>Differential Evolution ran only 18 generations and stopped on the iteration limit, not convergence. More generations or seeds would confirm the global optimum.</li>
+<li>The model is educational and does not represent any operational vehicle; baseline values are assumed.</li></ul></div>
+
+<div class="card" id="conclusion"><h2>10. Conclusion and future work</h2><p>A transparent, modular simulation and optimisation framework was built that satisfies all minimum outputs of Challenge 01 and the Advanced Level requirement. The optimiser raised apogee from 9.28 km to 175.11 km within all resource limits, mainly by using the full propellant allowance, reducing dry mass and drag, launching near-vertically and choosing a higher thrust.</p>
+<p><b>Future work:</b> a pitch / gravity-turn control law, Mach-dependent Cd and ANSYS CFD-derived drag, multi-stage vehicles, structural and g-load constraints, wind and rotating-Earth effects, multiple optimiser seeds, and a multi-objective (altitude vs propellant) Pareto study.</p></div>
+
+<div class="card full" id="run"><h2>Appendix: how to run the Python project</h2><div class="eq">pip install -r requirements.txt<br>python main.py<br>python main.py --objective max_downrange<br>python main.py --objective min_propellant<br>python main.py --skip-optimize --euler --show-plots</div>
+<p>Outputs go to <code>results/</code>: trajectory CSVs, <code>performance_comparison.csv</code>, <code>optimization_results.csv</code>, <code>monte_carlo_samples.csv</code>, <code>summary.json</code> and all figures.</p></div>
+</div></div>
+<script>
+const G0=9.80665,RE=6371e3;
+const LB=[[0,288.15,-6.5e-3],[11e3,216.65,0],[20e3,216.65,1e-3],[32e3,228.65,2.8e-3],[47e3,270.65,0],[51e3,270.65,-2.8e-3],[71e3,214.65,-2e-3]];
+const PB=[];(function(){let p=101325;for(let i=0;i<LB.length;i++){PB.push(p);const nx=i<LB.length-1?LB[i+1][0]:86e3,[h0,T0,L]=LB[i],dh=nx-h0;p=L?p*Math.pow((T0+L*dh)/T0,-G0/(L*287.053)):p*Math.exp(-G0*dh/(287.053*T0));}})();
+function rho(h){if(h<0)h=0;if(h>86e3)return 6.958e-6*Math.exp(-(h-86e3)/12e3);let i=LB.length-1;while(LB[i][0]>h)i--;const[h0,T0,L]=LB[i],dh=h-h0,T=T0+L*dh,p=L?PB[i]*Math.pow(T/T0,-G0/(L*287.053)):PB[i]*Math.exp(-G0*dh/(287.053*T0));return p/(287.053*T);}
+function sim(c,dt){dt=dt||.05;const th=c.th*Math.PI/180,mdot=c.T/(c.isp*G0),tc=Math.min(c.tb,c.mp/mdot);
+const f=(t,s)=>{const[,h,vx,vy,mp]=s,on=t<tc-1e-9,m=c.md+mp,v=Math.hypot(vx,vy),q=.5*rho(h)*v*v,D=q*c.cd*c.A,Tn=on?c.T:0,g=G0*Math.pow(RE/(RE+h),2);
+const ax=(Tn*Math.cos(th)-(v?D*vx/v:0))/m,ay=(Tn*Math.sin(th)-(v?D*vy/v:0))/m-g;return[vx,vy,ax,ay,on?-mdot:0];};
+let t=0,s=[0,0,0,0,c.mp];const o={t:[0],x:[0],h:[0],v:[0],a:[],m:[],q:[0],T:[]};
+const rec=(t,s,d)=>{o.a.push(Math.hypot(d[2],d[3]));o.m.push(c.md+s[4]);o.T.push(t<tc-1e-9?c.T:0);};
+rec(0,s,f(0,s));
+while(t<2000){let h=dt;if(t<tc&&t+h>tc)h=tc-t;
+const k1=f(t,s),a=(k,w)=>s.map((x,i)=>x+w*k[i]),k2=f(t+h/2,a(k1,h/2)),k3=f(t+h/2,a(k2,h/2)),k4=f(t+h,a(k3,h));
+const n=s.map((x,i)=>x+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));n[4]=Math.max(0,n[4]);t+=h;
+if(n[1]<0&&t>1){const r=s[1]/(s[1]-n[1]);t=t-h+h*r;for(let i=0;i<5;i++)n[i]=s[i]+(n[i]-s[i])*r;s=n;o.t.push(t);o.x.push(s[0]);o.h.push(0);o.v.push(Math.hypot(s[2],s[3]));o.q.push(.5*rho(0)*o.v[o.v.length-1]**2);rec(t,s,f(t,s));break;}
+s=n;o.t.push(t);o.x.push(s[0]);o.h.push(s[1]);const v=Math.hypot(s[2],s[3]);o.v.push(v);o.q.push(.5*rho(s[1])*v*v);rec(t,s,f(t,s));if(s[1]>1e6)break;}
+o.tc=tc;return o;}
+
+const $=s=>document.querySelector(s),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const DB={T:6200,mp:180,tb:42,th:72,cd:.42,md:160,isp:245,A:.18},DO={T:10729,mp:257.65,tb:62.02,th:88.98,cd:.2228,md:130.07,isp:245,A:.18};
+let B={...DB},O={...DO},rb,ro,mb,mo,view='dual',t=0,playing=true,speed=20,tab='h',rtab='cv',conv=[],mc=null,busy=false;
+const K=['T','mp','tb','th','cd','md'],BD=[[3500,14000],[50,260],[15,90],[55,90],[.22,.55],[130,220]];
+const SL=[['T','Thrust (N)',3500,14000,50,0],['mp','Propellant mass (kg)',50,260,.05,2],['tb','Burn time (s)',15,90,.1,1],['th','Launch angle (deg)',55,90,.01,2],['cd','Drag coefficient',.22,.55,.001,3],['md','Dry mass (kg)',130,220,.05,2]];
+const TABS=[['h','Altitude','km'],['v','Velocity','m/s'],['a','Acceleration','m/s²'],['m','Mass','kg'],['q','Dynamic pressure','kPa'],['T','Thrust','N']];
+const fm=(v,d)=>v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function met(o,c){let k=0;o.h.forEach((x,i)=>{if(x>o.h[k])k=i});const md=c.T/(c.isp*G0);return{h:o.h[k]/1e3,ta:o.t[k],v:Math.max(...o.v),a:Math.max(...o.a),q:Math.max(...o.q)/1e3,tf:o.t[o.t.length-1],dr:o.x[o.x.length-1]/1e3,m0:c.md+c.mp,pc:md*o.tc,tc:o.tc};}
+function at(o,k,x){const T=o.t,n=T.length-1;if(x>=T[n])return o[k][n];let lo=0,hi=n;while(hi-lo>1){const m=(lo+hi)>>1;T[m]>x?hi=m:lo=m}const f=(x-T[lo])/(T[hi]-T[lo]);return o[k][lo]+(o[k][hi]-o[k][lo])*f;}
+const vis=()=>view==='dual'?['b','o']:[view];
+const nice=(a,b,n)=>{if(b<=a)b=a+1;const s=(b-a)/n,p=Math.pow(10,Math.floor(Math.log10(s))),m=s/p,st=(m<1.5?1:m<3?2:m<7?5:10)*p,r=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)r.push(+v.toFixed(10));return r};
+function setup(cv){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);const c=cv.getContext('2d');c.setTransform(d,0,0,d,0,0);return[c,r.width,r.height];}
+function axes(c,W,H,g,xt,yt,xl,yl){c.font='10px JetBrains Mono,monospace';c.lineWidth=1;const X=v=>g.L+(v-g.x0)/(g.x1-g.x0)*(W-g.L-g.R),Y=v=>H-g.B-(v-g.y0)/(g.y1-g.y0)*(H-g.T-g.B);
+c.strokeStyle=g.ln;c.fillStyle=g.mut;c.textAlign='right';yt.forEach(v=>{const y=Y(v);c.beginPath();c.moveTo(g.L,y);c.lineTo(W-g.R,y);c.stroke();c.fillText(+v.toPrecision(4),g.L-5,y+3)});
+c.textAlign='center';xt.forEach(v=>{const x=X(v);c.beginPath();c.moveTo(x,T0(g));c.lineTo(x,H-g.B);c.stroke();c.fillText(+v.toPrecision(4),x,H-g.B+13)});
+if(xl)c.fillText(xl,(g.L+W-g.R)/2,H-3);if(yl){c.save();c.translate(10,(g.T+H-g.B)/2);c.rotate(-Math.PI/2);c.fillText(yl,0,0);c.restore()}return[X,Y];}
+const T0=g=>g.T;
+function line(cv,S,o){const[c,W,H]=setup(cv);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;S.forEach(s=>{for(let i=0;i<s.x.length;i++){const a=s.x[i],b=s.y[i];if(a<x0)x0=a;if(a>x1)x1=a;if(b<y0)y0=b;if(b>y1)y1=b}});
+if(o.zero)y0=Math.min(0,y0);if(y1<=y0)y1=y0+1;y1+=(y1-y0)*.05;const g={L:50,R:10,T:8,B:30,W,H,x0,x1,y0,y1,ln:css('--ln'),mut:css('--mut')};cv._g=g;
+const[X,Y]=axes(c,W,H,g,nice(x0,x1,6),nice(y0,y1,5),o.xl,o.yl);c.lineWidth=2;S.forEach(s=>{c.strokeStyle=s.col;c.setLineDash(s.dash||[]);c.beginPath();const st=Math.max(1,Math.floor(s.x.length/900));for(let i=0;i<s.x.length;i+=st)i?c.lineTo(X(s.x[i]),Y(s.y[i])):c.moveTo(X(s.x[i]),Y(s.y[i]));c.lineTo(X(s.x[s.x.length-1]),Y(s.y[s.y.length-1]));c.stroke()});c.setLineDash([]);return[c,X,Y,g];}
+function tele(){const k=tab,cv=$('#tel'),ti=TABS.find(x=>x[0]===k),S=[];const f=k==='h'?v=>v/1e3:k==='q'?v=>v/1e3:v=>v;
+vis().forEach(w=>{const o=w==='b'?rb:ro;S.push({x:o.t,y:o[k].map(f),col:css(w==='b'?'--p':'--r')})});line(cv,S,{xl:'time (s)',yl:ti[1]+' ('+ti[2]+')',zero:k!=='m'});curs();}
+function curs(){const g=$('#tel')._g;if(!g)return;const e=$('#tc');e.style.left=(12+g.L+Math.min(1,Math.max(0,(t-g.x0)/(g.x1-g.x0)))*(g.W-g.L-g.R))+'px';e.style.top=(10+g.T)+'px';e.style.height=(g.H-g.T-g.B)+'px';}
+function kpis(){const R=[['Max altitude','km','h',2],['Max velocity','m/s','v',0],['Max acceleration','m/s²','a',1],['Time to apogee','s','ta',1],['Max-Q','kPa','q',1],['Flight time','s','tf',1]];
+$('#kpi').innerHTML=R.map(([l,u,k,d])=>`<div class="k"><div class="kh">${l}<span>${u}</span></div><div class="kv"><span class="vp">${fm(mb[k],d)}</span><span class="vr">${fm(mo[k],d)}</span></div><div class="ks">x${fm(mo[k]/mb[k],2)} vs baseline</div></div>`).join('');
+const T=[['Maximum altitude (km)','h',3],['Maximum velocity (m/s)','v',1],['Maximum acceleration (m/s²)','a',2],['Time to apogee (s)','ta',1],['Total flight time (s)','tf',1],['Downrange distance (km)','dr',2],['Initial mass (kg)','m0',1],['Propellant consumed (kg)','pc',1],['Engine cutoff (s)','tc',2],['Max dynamic pressure (kPa)','q',1]];
+$('#res').innerHTML='<tr><th>Quantity</th><th style="color:var(--p)">Baseline</th><th style="color:var(--r)">Optimised</th><th>Change</th></tr>'+T.map(([l,k,d])=>{const p=(mo[k]/mb[k]-1)*100;return`<tr><td>${l}</td><td>${fm(mb[k],d)}</td><td>${fm(mo[k],d)}</td><td>${p>=0?'+':''}${fm(p,1)} %</td></tr>`}).join('');
+$('#gain').textContent='apogee x'+fm(mo.h/mb.h,1);
+const e=(c,o)=>[['Propellant ≤ 260 kg',c.mp<=260],['Mass ≤ 450 kg',c.md+c.mp<=450],['Thrust 3.5-14 kN',c.T>=3500&&c.T<=14000],['Burn 15-90 s',c.tb>=15&&c.tb<=90],['Angle 55-90°',c.th>=55&&c.th<=90]];
+$('#chk').innerHTML=e(O).map(([l,ok])=>`<span>${l}: <span class="${ok?'ok':'bad'}">${ok?'PASS':'FAIL'}</span></span>`).join('');}
+function compute(){rb=sim(B,.1);ro=sim(O,.1);mb=met(rb,B);mo=met(ro,O);const mx=Math.ceil(Math.max(mb.tf,mo.tf));$('#scrub').max=mx;kpis();tele();drawR();}
+function sliders(){$('#sl').innerHTML=SL.map(([k,l,a,b,s,d])=>`<div class="sl"><label for="s_${k}">${l}</label><output id="o_${k}"></output><input type="range" id="s_${k}" min="${a}" max="${b}" step="${s}" data-k="${k}"></div>`).join('');
+document.querySelectorAll('#sl input').forEach(i=>i.oninput=()=>{O[i.dataset.k]=+i.value;syncS();soon()});syncS();}
+function syncS(){SL.forEach(([k,,,,,d])=>{$('#s_'+k).value=O[k];$('#o_'+k).textContent=fm(O[k],d)})}
+let pend=0;function soon(){if(!pend)pend=requestAnimationFrame(()=>{pend=0;mc=null;compute()})}
+/* stage */
+const stars=Array.from({length:70},(_,i)=>[(Math.sin(i*91.7)+1)/2,(Math.sin(i*37.3+2)+1)/2,.4+(i%3)*.3]);
+function stage(){const cv=$('#cv'),[c,W,H]=setup(cv),L=70,R=26,T=28,Bt=44,V=vis();let xm=.5,ym=1;V.forEach(w=>{const m=w==='b'?mb:mo,o=w==='b'?rb:ro;xm=Math.max(xm,Math.max(...o.x)/1e3);ym=Math.max(ym,m.h)});xm*=1.12;ym*=1.1;
+const sky=c.createLinearGradient(0,H-Bt,0,0);sky.addColorStop(0,'#10223f');sky.addColorStop(.35,'#070d1c');sky.addColorStop(1,'#03060e');c.fillStyle=sky;c.fillRect(0,0,W,H);
+stars.forEach(s=>{c.fillStyle='rgba(255,255,255,'+s[2]+')';c.fillRect(L+s[0]*(W-L-R),T+s[1]*(H-T-Bt)*.85,1.3,1.3)});
+const g={L,R,T,B:Bt,x0:0,x1:xm,y0:0,y1:ym,ln:'#ffffff14',mut:'#8b97ad'},[X,Y]=axes(c,W,H,g,nice(0,xm,6),nice(0,ym,6),'downrange (km), axes not to scale','altitude (km)');
+if(ym>100){c.strokeStyle='#8b97ad';c.setLineDash([4,4]);c.beginPath();c.moveTo(L,Y(100));c.lineTo(W-R,Y(100));c.stroke();c.setLineDash([]);c.fillStyle='#8b97ad';c.textAlign='left';c.fillText('100 km, edge of space',L+6,Y(100)-4)}
+c.strokeStyle='#e8edf7';c.lineWidth=1.5;c.beginPath();c.moveTo(L,Y(0));c.lineTo(W-R,Y(0));c.stroke();
+V.forEach(w=>{const o=w==='b'?rb:ro,m=w==='b'?mb:mo,col=css(w==='b'?'--p':'--r'),n=o.t.length,st=Math.max(1,Math.floor(n/600));
+const path=(lim,al)=>{c.globalAlpha=al;c.strokeStyle=col;c.lineWidth=2;c.beginPath();for(let i=0;i<n&&o.t[i]<=lim;i+=st){const x=X(o.x[i]/1e3),y=Y(o.h[i]/1e3);i?c.lineTo(x,y):c.moveTo(x,y)}const e=Math.min(lim,m.tf);c.lineTo(X(at(o,'x',e)/1e3),Y(at(o,'h',e)/1e3));c.stroke();c.globalAlpha=1};
+path(1e9,.22);path(t,1);
+[[m.tc,'MECO'],[m.ta,'apogee'],[m.tf,'impact']].forEach(([te,l])=>{if(t>=te){const x=X(at(o,'x',te)/1e3),y=Y(at(o,'h',te)/1e3);c.fillStyle='#fff';c.beginPath();c.arc(x,y,3.2,0,7);c.fill();c.fillStyle=col;c.textAlign='left';c.fillText(l,x+6,y-5)}});
+const px=at(o,'x',t)/1e3,py=at(o,'h',t)/1e3,x=X(px),y=Y(py),e=.3,dx=X(at(o,'x',Math.min(t+e,m.tf))/1e3)-X(at(o,'x',Math.max(t-e,0))/1e3),dy=Y(at(o,'h',Math.min(t+e,m.tf))/1e3)-Y(at(o,'h',Math.max(t-e,0))/1e3),ang=Math.atan2(dy,dx||1e-6);
+c.save();c.translate(x,y);c.rotate(ang);if(at(o,'T',t)>0){c.fillStyle='#ffb347';c.beginPath();c.moveTo(-5,0);c.lineTo(-17-Math.random()*5,0);c.lineTo(-5,3);c.moveTo(-5,0);c.lineTo(-5,-3);c.lineTo(-17,0);c.fill()}
+c.fillStyle='#e8edf7';c.beginPath();c.moveTo(9,0);c.lineTo(-6,-4.5);c.lineTo(-6,4.5);c.fill();c.fillStyle=col;c.fillRect(-6,-4.5,3,9);c.restore();
+c.fillStyle=col;c.font='600 11px JetBrains Mono,monospace';c.textAlign=x>W-170?'right':'left';c.fillText((w==='b'?'Baseline ':'Optimised ')+fm(py,1)+' km, '+fm(at(o,'v',t),0)+' m/s, '+fm(at(o,'m',t),0)+' kg',x+(x>W-170?-14:14),y+(py>ym*.9?16:-10))});}
+function tick(ts){if(tick.p!==undefined&&playing){t+=(ts-tick.p)/1000*speed;const mx=+$('#scrub').max;if(t>=mx){t=mx;playing=false;$('#play').textContent='Replay'}}tick.p=ts;$('#scrub').value=t;$('#clk').textContent='T+'+t.toFixed(1)+' s';stage();curs();requestAnimationFrame(tick)}
+/* right panel */
+function hist(c,W,H,v,nom){const n=12,a=Math.min(...v),b=Math.max(...v),w=(b-a)/n||1,bins=Array(n).fill(0);v.forEach(x=>bins[Math.min(n-1,Math.floor((x-a)/w))]++);const my=Math.max(...bins)+1,g={L:40,R:10,T:8,B:30,x0:Math.min(a,nom)-5,x1:Math.max(b,nom)+5,y0:0,y1:my,ln:css('--ln'),mut:css('--mut')},[X,Y]=axes(c,W,H,g,nice(g.x0,g.x1,6),nice(0,my,4),'maximum altitude (km)','count');
+c.fillStyle=css('--r');bins.forEach((k,i)=>c.fillRect(X(a+i*w)+1,Y(k),X(a+(i+1)*w)-X(a+i*w)-2,Y(0)-Y(k)));c.strokeStyle=css('--p');c.setLineDash([5,4]);c.lineWidth=2;c.beginPath();c.moveTo(X(nom),g.T);c.lineTo(X(nom),H-g.B);c.stroke();c.setLineDash([])}
+const VIR=['#440154','#3b528b','#21908d','#5dc863','#fde725'];function vir(f){f=Math.min(.999,Math.max(0,f))*4;const i=Math.floor(f),u=f-i,p=VIR[i],q=VIR[i+1],h=s=>[1,3,5].map(j=>parseInt(s.substr(j,2),16));const a=h(p),b=h(q);return'rgb('+a.map((x,j)=>Math.round(x+(b[j]-x)*u)).join()+')'}
+function heat(c,W,H){const th=[55,60,65,70,75,80,85,90],Ts=Array.from({length:10},(_,i)=>3500+i*10500/9),Z=Ts.map(T=>th.map(a=>{const o=sim({...O,T,th:a},.25);return Math.max(...o.h)/1e3})),mx=Math.max(...Z.flat()),L=50,Rm=60,Tp=8,Bm=30,cw=(W-L-Rm)/th.length,ch=(H-Tp-Bm)/Ts.length;
+Ts.forEach((T,i)=>th.forEach((a,j)=>{c.fillStyle=vir(Z[i][j]/mx);c.fillRect(L+j*cw,H-Bm-(i+1)*ch,cw+.5,ch+.5)}));c.fillStyle=css('--mut');c.font='10px JetBrains Mono,monospace';c.textAlign='center';th.forEach((a,j)=>c.fillText(a,L+(j+.5)*cw,H-Bm+13));c.fillText('launch angle (deg)',L+(W-L-Rm)/2,H-3);c.textAlign='right';Ts.forEach((T,i)=>{if(i%2==0)c.fillText(Math.round(T),L-4,H-Bm-(i+.5)*ch+3)});
+for(let i=0;i<60;i++){c.fillStyle=vir(i/59);c.fillRect(W-Rm+14,H-Bm-(i+1)*(H-Tp-Bm)/60,10,(H-Tp-Bm)/60+1)}c.textAlign='left';c.fillText(fm(mx,0)+' km',W-Rm+27,Tp+10);c.fillText('0',W-Rm+27,H-Bm);
+const cx=L+(O.th-55)/35*cw*8-0,cy=H-Bm-(O.T-3500)/10500*ch*10;c.strokeStyle='#e5484d';c.lineWidth=2;c.beginPath();c.moveTo(cx-5,cy-5);c.lineTo(cx+5,cy+5);c.moveTo(cx+5,cy-5);c.lineTo(cx-5,cy+5);c.stroke();}
+function drawR(){const cv=$('#rc'),n=$('#rn'),b=$('#mcb');b.hidden=rtab!=='mc';
+if(rtab==='cv'){if(!conv.length){const[c,W,H]=setup(cv);c.fillStyle=css('--mut');c.font='13px Space Grotesk,sans-serif';c.textAlign='center';c.fillText('Press "Run Differential Evolution" to see the best altitude per generation.',W/2,H/2);n.textContent='The report ran 18 generations and then refined with SLSQP (1,163 evaluations). This page runs DE only.';return}
+line(cv,[{x:conv.map((_,i)=>i),y:conv,col:css('--r')}],{xl:'generation',yl:'best altitude (km)'});n.textContent='Best altitude after '+(conv.length-1)+' generations: '+fm(conv[conv.length-1],1)+' km.'}
+else if(rtab==='ds'){const[c,W,H]=setup(cv);heat(c,W,H);n.textContent='Maximum altitude (km) over launch angle and thrust, other variables at the current design. Red cross: current design.'}
+else{const[c,W,H]=setup(cv);if(!mc){c.fillStyle=css('--mut');c.font='13px Space Grotesk,sans-serif';c.textAlign='center';c.fillText('Press "Run Monte Carlo": 40 samples, 5 % scatter on all six variables.',W/2,H/2);n.textContent='';return}
+hist(c,W,H,mc,mo.h);const mean=mc.reduce((a,b)=>a+b)/mc.length,sd=Math.sqrt(mc.reduce((a,b)=>a+(b-mean)**2,0)/mc.length);n.textContent='Mean '+fm(mean,1)+' km, std '+fm(sd,1)+' km ('+fm(sd/mean*100,0)+' %), range '+fm(Math.min(...mc),1)+'-'+fm(Math.max(...mc),1)+' km. Dashed line: current design.'}}
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function mcRun(){busy=true;$('#mcb').disabled=true;setTimeout(()=>{const r=rng(7),nz=()=>Math.sqrt(-2*Math.log(1-r()))*Math.cos(2*Math.PI*r());mc=[];for(let i=0;i<40;i++){const c={...O};K.forEach(k=>c[k]=O[k]*(1+.05*nz()));mc.push(Math.max(...sim(c,.25).h)/1e3)}busy=false;$('#mcb').disabled=false;drawR()},30)}
+function deRun(){if(busy)return;busy=true;$('#de').disabled=true;$('#rst').disabled=true;const r=rng(42),N=54,G=18,cl=(v,i)=>Math.min(BD[i][1],Math.max(BD[i][0],v));
+const ev=x=>{const c={...O};K.forEach((k,i)=>c[k]=x[i]);const h=Math.max(...sim(c,.25).h)/1e3;return -h+100*(Math.max(0,c.mp-260)+Math.max(0,c.md+c.mp-450))};
+let P=Array.from({length:N},()=>BD.map(([a,b])=>a+r()*(b-a))),F=P.map(ev),g=0;conv=[];
+const best=()=>F.indexOf(Math.min(...F));conv.push(-F[best()]);
+(function step(){const F0=.5+.5*r(),b=P[best()],nP=[],nF=[];for(let i=0;i<N;i++){let a,c;do{a=Math.floor(r()*N)}while(a===i);do{c=Math.floor(r()*N)}while(c===i||c===a);const jr=Math.floor(r()*6),y=P[i].map((v,j)=>(r()<.7||j===jr)?cl(b[j]+F0*(P[a][j]-P[c][j]),j):v),fy=ev(y);if(fy<F[i]){nP.push(y);nF.push(fy)}else{nP.push(P[i]);nF.push(F[i])}}
+P=nP;F=nF;g++;conv.push(-F[best()]);$('#msg').textContent='Generation '+g+' of '+G+', best '+fm(conv[conv.length-1],1)+' km';drawR();
+if(g<G)setTimeout(step,0);else{const x=P[best()];K.forEach((k,i)=>O[k]=x[i]);syncS();mc=null;busy=false;$('#de').disabled=false;$('#rst').disabled=false;compute();$('#msg').textContent='Done. Best design found: '+fm(mo.h,1)+' km with '+(N*(G+1))+' evaluations. Compare with the report: 175.1 km.'}})()}
+/* wiring */
+$('#seg').onclick=e=>{const m=e.target.dataset.m;if(!m)return;view=m;document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===e.target));tele()};
+$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';tele();drawR()};
+$('#play').onclick=()=>{if(!playing&&t>=+$('#scrub').max)t=0;playing=!playing;$('#play').textContent=playing?'Pause':'Play'};
+$('#rs').onclick=()=>{t=0;playing=true;$('#play').textContent='Pause'};
+$('#scrub').oninput=e=>{t=+e.target.value;playing=false;$('#play').textContent='Play'};
+const jump=k=>()=>{const o=view==='b'?mb:mo;t=o[k];playing=false;$('#play').textContent='Play'};$('#jb').onclick=jump('tc');$('#ja').onclick=jump('ta');$('#jl').onclick=jump('tf');
+$('#sp').onclick=e=>{const s=e.target.dataset.s;if(!s)return;speed=+s;document.querySelectorAll('#sp button').forEach(b=>b.classList.toggle('on',b===e.target))};
+$('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-k="${k}"${k===tab?' class="on"':''}>${l}</button>`).join('');
+$('#tabs').onclick=e=>{const k=e.target.dataset.k;if(!k)return;tab=k;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b===e.target));tele()};
+$('#rt').onclick=e=>{const k=e.target.dataset.r;if(!k)return;rtab=k;document.querySelectorAll('#rt button').forEach(b=>b.classList.toggle('on',b===e.target));drawR()};
+$('#de').onclick=deRun;$('#mcb').onclick=mcRun;$('#rst').onclick=()=>{O={...DO};conv=[];mc=null;syncS();compute();$('#msg').textContent=''};
+addEventListener('resize',()=>{tele();drawR()});
+sliders();compute();requestAnimationFrame(tick);
+
+</script></body></html>
